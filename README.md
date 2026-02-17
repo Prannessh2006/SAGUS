@@ -1,380 +1,237 @@
-# KAG Learning Platform
+🧠 SAGUS Architecture
 
-**Knowledge Augmented Generation (KAG)** - A personalized AI learning platform that combines Knowledge Graph reasoning with LLM verbalization for adaptive education.
+Structured Adaptive Graph for User-Specific Learning
 
-## 🎯 What is KAG?
+A deterministic, cognition-aware learning system that replaces probabilistic answering with structured reasoning grounded in a knowledge graph and personalized learner state modeling.
 
-KAG is **NOT** a chatbot, RAG system, LMS, or fine-tuned model. It is a **deterministic reasoning engine**:
+🎯 What is SAGUS?
 
-```
-Knowledge Graph + User Cognition → Deterministic Reasoning → LLM Verbalization
-```
+SAGUS is a post-RAG paradigm designed for education-grade reliability.
 
-### Core Principles
+Unlike conventional LLM systems:
 
-1. **Graph-Based Reasoning**: All knowledge comes from the Neo4j knowledge graph
-2. **User State Mapping**: Student's cognitive state is tracked and mapped to concepts
-3. **Dependency Traversal**: Prerequisites are traversed before any explanation
-4. **Gap Detection**: System identifies what the student doesn't know
-5. **LLM as Voice**: The LLM only verbalizes - it never supplies knowledge
-6. **Graceful Refusal**: When reasoning fails, the system refuses to answer
+Approach	Knowledge Source	Personalization	Determinism
+Chatbot	LLM memory	❌ None	❌ No
+RAG	Retrieved documents	❌ Shallow	❌ No
+Fine-tuned Model	Training data	❌ Static	❌ No
+LMS	Static curriculum	❌ Non-adaptive	✅ Yes
+SAGUS	Knowledge Graph + Cognitive Model	✅ Deep	✅ Yes
+🧩 Core Idea
+Structured Knowledge Graph
+        +
+User Cognitive State
+        ↓
+Deterministic Reasoning Engine
+        ↓
+LLM Verbalization Layer
 
-## 🏗️ Architecture
+The LLM does not generate knowledge.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Flutter Frontend                          │
-│                    (MVVM Architecture)                          │
-└─────────────────────────────────────────────────────────────────┘
+It only expresses graph-derived reasoning.
+
+🔬 Why SAGUS is Needed (Research Motivation)
+Problem in Current AI Learning Systems
+
+Hallucinated pedagogy
+
+No prerequisite awareness
+
+One-size-fits-all explanations
+
+No cognitive traceability
+
+High inference cost at scale
+
+SAGUS Solves This By:
+
+✔ Replacing probabilistic answering with graph traversal logic
+✔ Modeling learning as state transitions, not chat history
+✔ Enforcing prerequisite-first pedagogy
+✔ Making explanations traceable to nodes and edges
+✔ Moving heavy computation to offline Spark pipelines
+
+🏗️ SAGUS System Architecture
+Logical Architecture
+                ┌────────────────────────────┐
+                │     Flutter Interface      │
+                │  Personalized Interaction  │
+                └─────────────┬──────────────┘
                               │
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     FastAPI Backend                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
-│  │  KAG Engine │  │ Groq Client │  │   PySpark Analytics     │ │
-│  │  (Graph     │→ │ (Verbalize  │  │   (Offline Processing)  │ │
-│  │   Reasoning)│  │  Only)      │  │                         │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+                ┌────────────────────────────┐
+                │  FastAPI SAGUS Runtime     │
+                │                            │
+                │  ┌──────────────────────┐  │
+                │  │ Structured Reasoner  │  │
+                │  └──────────────────────┘  │
+                │  ┌──────────────────────┐  │
+                │  │ Cognitive Mapper     │  │
+                │  └──────────────────────┘  │
+                │  ┌──────────────────────┐  │
+                │  │ LLM Verbalizer       │  │
+                │  └──────────────────────┘  │
+                └─────────────┬──────────────┘
                               │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     Neo4j Knowledge Graph                        │
-│   ┌──────────┐    ┌──────────┐    ┌──────────────────────────┐ │
-│   │ Concept  │───▶│ REQUIRES │───▶│  Student Cognitive State │ │
-│   │  Nodes   │    │   Edges  │    │  (MASTERS/STRUGGLES_WITH)│ │
-│   └──────────┘    └──────────┘    └──────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## 📁 Project Structure
-
-```
-kag-platform/
-├── backend/
-│   ├── app/
-│   │   ├── core/
-│   │   │   └── config.py              # Configuration management
-│   │   ├── graph/
-│   │   │   ├── neo4j_client.py        # Neo4j async client
-│   │   │   └── cypher_queries.py      # All Cypher query templates
-│   │   ├── kag/
-│   │   │   ├── traversal_engine.py    # Graph traversal & reasoning
-│   │   │   ├── gap_analyzer.py        # Knowledge gap analysis
-│   │   │   └── context_builder.py     # LLM context preparation
-│   │   ├── llm/
-│   │   │   └── groq_client.py         # Groq API client
-│   │   ├── analytics/
-│   │   │   └── pyspark_jobs.py        # PySpark batch processing
-│   │   ├── routers/
-│   │   │   ├── student.py             # Student management API
-│   │   │   ├── learning.py            # Core KAG learning API
-│   │   │   └── assessment.py          # Assessment API
-│   │   ├── schemas/
-│   │   │   └── models.py              # Pydantic data models
-│   │   ├── data/
-│   │   │   └── curriculum_dataset.py  # Sample curriculum data
-│   │   ├── scripts/
-│   │   │   └── ingest_data.py         # Data ingestion script
-│   │   └── main.py                    # FastAPI application
-│   ├── Dockerfile
-│   └── requirements.txt
-├── flutter_app/
-│   ├── lib/
-│   │   ├── models/
-│   │   │   └── kag_models.dart        # Data models
-│   │   ├── viewmodels/
-│   │   │   ├── user_viewmodel.dart    # User state management
-│   │   │   └── chat_viewmodel.dart    # Chat state management
-│   │   ├── views/
-│   │   │   ├── home_view.dart         # Dashboard view
-│   │   │   └── chat_view.dart         # Learning interaction view
-│   │   ├── services/
-│   │   │   └── kag_api_service.dart   # API client
-│   │   └── main.dart                  # Flutter entry point
-│   └── pubspec.yaml
-├── docker-compose.yml
-├── .env
-└── README.md
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Git
-
-### 1. Clone and Setup
-
-```bash
-git clone <repository-url>
-cd kag-platform
-
-# Environment is already configured with your API key
-# No need to copy .env.example
-```
-
-### 2. Start Services
-
-```bash
-docker-compose up -d
-```
-
-This starts:
-- Neo4j on ports 7474 (HTTP UI) and 7687 (Bolt)
-- FastAPI backend on port 8000
-
-### 3. Ingest Curriculum Data
-
-```bash
-# Wait for Neo4j to be ready (about 30 seconds)
-docker-compose exec api python -m app.scripts.ingest_data
-```
-
-### 4. Access the Platform
-
-- **API Documentation**: http://localhost:8000/docs
-- **Neo4j Browser**: http://localhost:7474 (neo4j / kagpassword123)
-- **API Root**: http://localhost:8000/
-
-## 📚 API Endpoints
+                ┌─────────────▼──────────────┐
+                │ Neo4j Knowledge Graph       │
+                └─────────────┬──────────────┘
+                              │
+                ┌─────────────▼──────────────┐
+                │ FAISS Vector Index         │
+                │ Semantic Alignment Layer   │
+                └─────────────┬──────────────┘
+                              │
+                ┌─────────────▼──────────────┐
+                │ Apache Spark Analytics     │
+                │ Offline Optimization       │
+                └────────────────────────────┘
+📚 Knowledge Representation Layer
+Neo4j Graph (Symbolic Intelligence)
 
-### Learning (Core KAG)
+Encodes curriculum causality:
 
-```bash
-# Ask a question (main KAG endpoint)
-POST /api/v1/learning/ask
-{
-  "student_id": "student_001",
-  "query": "Linear Equations"
-}
+Concept dependencies
 
-# Search concepts
-GET /api/v1/learning/concepts/search?q=equation
+Cognitive difficulty gradients
 
-# Get concept details
-GET /api/v1/learning/concepts/{concept_id}
+Error propagation paths
 
-# Get concept dependencies
-GET /api/v1/learning/concepts/{concept_id}/dependencies
+Example grounding
 
-# Check readiness
-GET /api/v1/learning/readiness/{student_id}/{concept_id}
-```
+This enables reasoning over learning, not just answering questions.
 
-### Student Management
+FAISS Vector Layer (Semantic Bridge)
 
-```bash
-# Create student
-POST /api/v1/student/
+Used not for retrieval, but for:
 
-# Get student
-GET /api/v1/student/{student_id}
+Concept-aligned embedding clustering
 
-# Get knowledge state
-GET /api/v1/student/{student_id}/knowledge-state
+Misconception similarity detection
 
-# Update mastery
-POST /api/v1/student/{student_id}/mastery
+Semantic normalization of queries
 
-# Record struggle
-POST /api/v1/student/{student_id}/struggle
-```
+Graph = Truth Layer
+FAISS = Interpretation Layer
+🧠 Cognitive Personalization Model
 
-### Assessment
+Each learner has a dynamic state vector:
 
-```bash
-# Create assessment
-POST /api/v1/assessment/create
+Student State S =
+{ mastered concepts,
+  fragile concepts,
+  misconception clusters,
+  learning velocity,
+  cognitive load threshold }
 
-# Submit assessment
-POST /api/v1/assessment/submit
+SAGUS reasons against S, not against the query alone.
 
-# Get mastery report
-GET /api/v1/assessment/report/{student_id}
-```
+⚙️ Deterministic Reasoning Engine
 
-## 🔬 KAG Reasoning Flow
+The SAGUS Engine executes:
 
-When a student asks about a concept:
+Step 1 — Concept Resolution
 
-```
-1. CONCEPT RESOLUTION
-   └─► Find concept in knowledge graph
-   └─► If not found → REFUSE
+Maps query → graph node (no semantic guessing).
 
-2. DEPENDENCY TRAVERSAL
-   └─► Get all prerequisite concepts
-   └─► Build dependency chain
+Step 2 — Dependency Expansion
 
-3. USER STATE MAPPING
-   └─► Get student's mastery state
-   └─► Map to dependency chain
+Traverses REQUIRES edges.
 
-4. GAP ANALYSIS
-   └─► Identify missing prerequisites
-   └─► Calculate readiness score
-   └─► Prioritize gaps
+Step 3 — Cognitive Alignment
 
-5. CONTEXT BUILDING
-   └─► Structure reasoning for LLM
-   └─► Apply strict constraints
-   └─► Set response type
+Matches learner mastery to dependency chain.
 
-6. LLM VERBALIZATION
-   └─► Express reasoning in natural language
-   └─► LLM CANNOT add knowledge
-```
+Step 4 — Gap Quantification
 
-## 🧠 Knowledge Graph Schema
+Computes readiness function:
 
-### Nodes
+Readiness(C) = Σ mastery(prerequisites) / depth
+Step 5 — Explanation Construction
 
-```cypher
-(:Concept {
-  id: string,
-  name: string,
-  description: string,
-  domain: string,
-  grade_level: int,
-  difficulty: float,
-  keywords: [string],
-  curriculum_code: string
-})
+Builds structured reasoning tree.
 
-(:Student {
-  id: string,
-  name: string,
-  grade_level: int,
-  learning_style: string
-})
+Step 6 — LLM Verbalization
 
-(:Example {id: string, content: string})
-(:Formula {id: string, expression: string})
-```
+LLM converts reasoning → natural explanation.
 
-### Relationships
+🚀 Apache Spark Integration (Cost-Aware Deployment)
 
-```cypher
-(:Concept)-[:REQUIRES {strength: float}]->(:Concept)
-(:Concept)-[:BUILDS_ON]->(:Concept)
-(:Concept)-[:HAS_EXAMPLE]->(:Example)
-(:Concept)-[:HAS_FORMULA]->(:Formula)
-(:Student)-[:MASTERS {mastery_level: float, confidence: float}]->(:Concept)
-(:Student)-[:STRUGGLES_WITH {struggle_count: int, error_patterns: [string]}]->(:Concept)
-```
+Spark handles all non-real-time computation:
 
-## 🔧 Configuration
+Task	Why Spark
+Curriculum ingestion	Distributed parsing
+Embedding generation	Batch GPU scheduling
+Student analytics	Scalable profiling
+Concept difficulty calibration	Large-scale regression
+Vector index rebuilding	Offline FAISS sync
+Cloud cost reduction	Avoid real-time recompute
 
-Key environment variables (in `.env`):
+This shifts SAGUS from:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NEO4J_URI` | Neo4j connection URI | `bolt://neo4j:7687` |
-| `NEO4J_USER` | Neo4j username | `neo4j` |
-| `NEO4J_PASSWORD` | Neo4j password | `kagpassword123` |
-| `GROQ_API_KEY` | Groq API key | (required) |
-| `GROQ_MODEL` | Groq model name | `llama-3.3-70b-versatile` |
-| `GROQ_TEMPERATURE` | LLM temperature | `0.1` |
-| `MAX_DEPENDENCY_DEPTH` | Max traversal depth | `10` |
-| `MIN_MASTERY_THRESHOLD` | Minimum mastery to proceed | `0.7` |
+Expensive Online Intelligence
+→ Efficient Offline Intelligence
+💰 Deployment Efficiency Model
 
-## 📱 Flutter App
+Traditional LLM tutoring:
 
-### Run the App
+Cost ∝ Number of Queries
 
-```bash
-cd flutter_app
+SAGUS:
 
-# Get dependencies
-flutter pub get
+Cost ∝ Graph Updates (infrequent)
 
-# Run on Chrome (web)
-flutter run -d chrome
+This drastically reduces inference-time compute.
 
-# Run on iOS simulator
-flutter run -d ios
+🔍 Research Contributions
 
-# Run on Android emulator
-flutter run -d android
-```
+SAGUS introduces a new category:
 
-### Configure API URL
+Structured Generation Systems (SGS)
 
-Edit `lib/services/kag_api_service.dart`:
+Key contributions:
 
-```dart
-KagApiService({
-  this.baseUrl = 'http://YOUR_HOST:8000/api/v1',  // Change this
-});
-```
+Knowledge-first AI architecture
 
-## 🧪 Testing
+Deterministic pedagogical reasoning
 
-### Backend Tests
+Hybrid symbolic–vector intelligence
 
-```bash
-cd backend
-pytest tests/ -v
-```
+Cognitive-state-driven personalization
 
-### API Testing
+Cost-shifted scalable deployment model
 
-Use the Swagger UI at http://localhost:8000/docs
+📊 Comparison With Existing Paradigms
+Feature	RAG	KGQA	Adaptive LMS	SAGUS
+Uses LLM Memory	✔	❌	❌	❌
+Deterministic	❌	✔	✔	✔
+Personalized	❌	❌	✔	✔✔
+Semantic Awareness	✔	❌	❌	✔
+Scalable	❌	❌	✔	✔✔
+Hallucination-Free	❌	✔	✔	✔✔
+🧪 Ongoing Research Directions
 
-## 📊 Sample Curriculum
+You can include this as your “Future Work” section:
 
-The platform includes a sample Mathematics curriculum covering:
+1. Graph Neural Augmentation
 
-- **Grades 1-5**: Basic arithmetic, multiplication, fractions, decimals
-- **Grades 6-8**: Ratios, percentages, equations, linear functions
-- **Grades 9-12**: Quadratics, trigonometry, calculus
+Learning edge weights dynamically from student performance.
 
-Plus introductory Physics concepts.
+2. Misconception Propagation Modeling
 
-## 🔄 PySpark Analytics
+Detecting cognitive bottlenecks via graph signal flow.
 
-Offline batch processing for:
+3. Reinforcement-Based Curriculum Reordering
 
-- Curriculum data validation
-- Difficulty calibration
-- Learning pattern analysis
-- Graph partitioning
+Optimizing learning path sequencing.
 
-Run with:
-```bash
-docker-compose exec api python -c "
-from app.analytics.pyspark_jobs import SparkAnalyticsEngine
-engine = SparkAnalyticsEngine()
-# Run analytics jobs...
-"
-```
+4. Cost-Aware Cloud Scheduling
 
-## 🛡️ KAG Constraints
+Spark-driven adaptive compute allocation.
 
-The system enforces these critical constraints:
+5. Multimodal Knowledge Nodes
 
-1. **No External Knowledge**: LLM cannot use knowledge outside the graph
-2. **Dependency Order**: Concepts must be explained in dependency order
-3. **Gap Acknowledgment**: All gaps must be explicitly addressed
-4. **Refusal on Failure**: System refuses when reasoning cannot proceed
-5. **Verbalization Only**: LLM role is strictly to express, not to know
+Integrating diagrams, simulations, and proofs as graph primitives.
 
-## 📝 License
+📦 Repository Positioning Statement
 
-MIT License - See LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
-
-## 📧 Support
-
-For issues and questions, please open a GitHub issue.
-#   S A G U S  
- 
+This repository implements SAGUS, a deterministic AI learning framework that replaces generative answering with structured reasoning over a knowledge graph, augmented by semantic indexing (FAISS) and large-scale offline analytics (Apache Spark) to deliver scalable, personalized, and cost-efficient education systems.
